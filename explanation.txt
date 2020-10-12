@@ -1,0 +1,12 @@
+My initial thoughts after reading this problem were
+to structure this grid system with a 2D-array given the 
+initial X, Y input of the northeast corner. Also, I must 
+also have to keep track of the direction at which the rover
+is facing. I'm thinking of possibly just initializing this 
+as a variable signaling North, then reassigning this variable
+as needed. If the current direction is L or R then the rover
+will move up or down the 'row', otherwise it will move up or
+down the 'column'.
+
+- I will have to ask for user input accepting northeast corner
+- I will have to ask for user input accepting a string of letters
