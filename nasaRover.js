@@ -3,6 +3,11 @@ const readline = require("readline").createInterface({
   output: process.stdout,
 });
 
+//variables
+let grid;
+let currentLocation;
+let moves;
+
 //helper functions
 const createGrid = (northeastCorner) => {
   let [x, y] = northeastCorner.split(",");
@@ -15,7 +20,7 @@ const createGrid = (northeastCorner) => {
 
 const formatLocation = (input) => {
   let [x, y, z] = input.split(",");
-  return [Number(x), Number(y), z];
+  return [Number(x), Number(y), z.toUpperCase()];
 };
 const formatMoves = (input) => {
   return input.split(",");
@@ -23,21 +28,23 @@ const formatMoves = (input) => {
 
 //callbacks
 let gridCallback = (northeastCorner) => {
-  readline.close();
   grid = createGrid(northeastCorner);
-  navigateRovers();
+  prompt("location", grid);
 };
-let locationCallback = (location) => {
-  readline.close();
+let locationCallback = (location, grid) => {
   currentLocation = formatLocation(location);
+  prompt("move", grid, currentLocation);
 };
-let movesCallback = (moves) => {
+let movesCallback = (move, grid, currentLocation) => {
+  moves = formatMoves(move);
   readline.close();
-  moves = formatMoves(moves);
+  if (grid) {
+    navigateRovers();
+  }
 };
 
 //prompts
-const prompt = (option) => {
+const prompt = (option, grid, location) => {
   switch (option) {
     case "start":
       readline.question(
@@ -46,22 +53,21 @@ const prompt = (option) => {
       );
       break;
     case "location":
-      readline.question("Enter the location as x,y,z", locationCallback);
+      readline.question("Enter the location as x,y,z: ", (val) =>
+        locationCallback(val, grid)
+      );
       break;
     case "move":
-      readline.question("Enter the moves as R,M,L,L,R...", movesCallback);
+      readline.question("Enter the moves as R,M,L,L,R...: ", (val) =>
+        movesCallback(val, grid, location)
+      );
       break;
   }
 };
 
-// variables
-let grid;
-let currentLocation;
-let moves;
-
 //main
 const navigateRovers = () => {
-  console.log(grid);
+  while (moves.length) {}
 };
 
 prompt("start");
