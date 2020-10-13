@@ -10,3 +10,12 @@ down the 'column'.
 
 - I will have to ask for user input accepting northeast corner
 - I will have to ask for user input accepting a string of letters
+
+Thoughts continued:
+    - I had to consider the edge cases of when the rover is at 
+    the bounds of the grid.
+    
+
+-Assumptions
+    - Entered rover coordinates lie within the grid.
+    - Entered parameters are formatted as expected.
