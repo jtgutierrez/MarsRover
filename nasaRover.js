@@ -1,7 +1,3 @@
-const { read } = require("fs");
-const { resolve } = require("path");
-const { dir } = require("console");
-
 const readline = require("readline").createInterface({
   input: process.stdin,
   output: process.stdout,
@@ -46,28 +42,22 @@ let movesCallback = (move, grid, currentLocation) => {
 const prompt = (option, grid, location) => {
   switch (option) {
     case "start":
-      return new Promise((resolve, reject) => {
-        readline.question(
-          "Enter the northeast corner coordinates as x,y: ",
-          gridCallback
-        );
-      });
-
-    //   break;
+      return readline.question(
+        "Enter the northeast corner coordinates as x,y: ",
+        gridCallback
+      );
     case "location":
-      return new Promise((resolve, reject) => {
-        readline.question("Enter the location as x,y,z: ", (val) =>
+      return new Promise((resolve) => {
+        readline.question("Enter the location of the rover as x,y,z: ", (val) =>
           resolve(locationCallback(val, grid))
         );
       });
-    //   break;
     case "move":
-      return new Promise((resolve, reject) => {
-        readline.question("Enter the moves as RMLLR...: ", (val) =>
+      return new Promise((resolve) => {
+        readline.question("Enter the move instructions as RMLLR...: ", (val) =>
           resolve(movesCallback(val, grid, location))
         );
       });
-    //   break;
   }
 };
 
@@ -80,7 +70,6 @@ let moves;
 const navigateRovers = async () => {
   let allDirections = ["N", "E", "S", "W"];
   let map = { N: 1, S: -1, E: 1, W: -1 };
-
   while (moves.length) {
     let [x, y, direction] = currentLocation;
     let idx = allDirections.indexOf(direction);
@@ -94,9 +83,15 @@ const navigateRovers = async () => {
       direction = allDirections[idx];
     } else if (move === "M") {
       if (direction === "N" || direction === "S") {
-        y += map[direction];
+        let newYCoords = y + map[direction];
+        if (newYCoords >= 0 && newYCoords < grid.length) {
+          y += map[direction];
+        }
       } else {
-        x += map[direction];
+        let newXCoords = x + map[direction];
+        if (newXCoords >= 0 && newXCoords < grid[0].length) {
+          x += map[direction];
+        }
       }
     }
     currentLocation = [x, y, direction];
