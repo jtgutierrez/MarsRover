@@ -1,3 +1,7 @@
+const { read } = require("fs");
+const { resolve } = require("path");
+const { dir } = require("console");
+
 const readline = require("readline").createInterface({
   input: process.stdin,
   output: process.stdout,
@@ -18,45 +22,52 @@ const formatLocation = (input) => {
   return [Number(x), Number(y), z.toUpperCase()];
 };
 const formatMoves = (input) => {
-  return input.split("").join("");
+  return input.split("");
 };
 
 //callbacks
 let gridCallback = (northeastCorner) => {
   grid = createGrid(northeastCorner);
-  prompt("location", grid);
+  return prompt("location", grid);
 };
 let locationCallback = (location, grid) => {
   currentLocation = formatLocation(location);
-  prompt("move", grid, currentLocation);
+  return prompt("move", grid, currentLocation);
 };
 let movesCallback = (move, grid, currentLocation) => {
   moves = formatMoves(move);
+  readline.pause();
   if (grid) {
     navigateRovers();
   }
-  readline.pause();
 };
 
 //prompts
 const prompt = (option, grid, location) => {
   switch (option) {
     case "start":
-      readline.question(
-        "Enter the northeast corner coordinates as x,y: ",
-        gridCallback
-      );
-      break;
+      return new Promise((resolve, reject) => {
+        readline.question(
+          "Enter the northeast corner coordinates as x,y: ",
+          gridCallback
+        );
+      });
+
+    //   break;
     case "location":
-      readline.question("Enter the location as x,y,z: ", (val) =>
-        locationCallback(val, grid)
-      );
-      break;
+      return new Promise((resolve, reject) => {
+        readline.question("Enter the location as x,y,z: ", (val) =>
+          resolve(locationCallback(val, grid))
+        );
+      });
+    //   break;
     case "move":
-      readline.question("Enter the moves as RMLLR...: ", (val) =>
-        movesCallback(val, grid, location)
-      );
-      break;
+      return new Promise((resolve, reject) => {
+        readline.question("Enter the moves as RMLLR...: ", (val) =>
+          resolve(movesCallback(val, grid, location))
+        );
+      });
+    //   break;
   }
 };
 
@@ -66,15 +77,14 @@ let currentLocation;
 let moves;
 
 //main
-const navigateRovers = () => {
-  let direction = currentLocation.pop();
-  let [x, y] = currentLocation;
+const navigateRovers = async () => {
   let allDirections = ["N", "E", "S", "W"];
-  let idx = allDirections.indexOf(direction);
   let map = { N: 1, S: -1, E: 1, W: -1 };
 
-  for (let i = 0; i < moves.length; i++) {
-    let move = moves[i];
+  while (moves.length) {
+    let [x, y, direction] = currentLocation;
+    let idx = allDirections.indexOf(direction);
+    let move = moves.shift();
 
     if (move === "L" || move === "R") {
       move === "L" ? (idx -= 1) : (idx += 1);
@@ -89,9 +99,13 @@ const navigateRovers = () => {
         x += map[direction];
       }
     }
-    // console.log([x, y, direction]);
+    currentLocation = [x, y, direction];
+
+    if (!moves.length) {
+      console.log(x, y, direction);
+      await prompt("location");
+    }
   }
-  console.log(x, y, direction);
 };
 
 prompt("start");
